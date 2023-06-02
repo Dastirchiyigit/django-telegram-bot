@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # 3rd party apps
     'django_celery_beat',
     'debug_toolbar',
+    "Post",
 
     # local apps
     'users.apps.UsersConfig',
@@ -181,3 +182,7 @@ TELEGRAM_LOGS_CHAT_ID = os.getenv("TELEGRAM_LOGS_CHAT_ID", default=None)
 #     send_default_pii=True
 # )
 
+# Base url to serve media files
+MEDIA_URL = '/media/'
+# Path where media is stored
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

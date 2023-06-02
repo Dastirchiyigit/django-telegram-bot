@@ -3,7 +3,7 @@
 """
 from telegram.ext import (
     Dispatcher, Filters,
-    CommandHandler, MessageHandler,
+    CommandHandler, MessageHandler,InlineQueryHandler,
     CallbackQueryHandler,
 )
 
@@ -18,14 +18,43 @@ from tgbot.handlers.location import handlers as location_handlers
 from tgbot.handlers.onboarding import handlers as onboarding_handlers
 from tgbot.handlers.broadcast_message import handlers as broadcast_handlers
 from tgbot.main import bot
+from telegram.ext import ConversationHandler
+from states.St import *
+from tgbot.handlers.onboarding.handlers import photo,caption,name
 
 
 def setup_dispatcher(dp):
+
     """
     Adding handlers for events from Telegram
     """
     # onboarding
     dp.add_handler(CommandHandler("start", onboarding_handlers.command_start))
+    
+    dp.add_handler(CommandHandler("Posts", onboarding_handlers.commmand_Post))
+    
+    dp.add_handler(CommandHandler("add_post", onboarding_handlers.add_post))
+    
+    # dp.add_handler(InlineQueryHandler(onboarding_handlers.inlinequery))
+
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('add_post',onboarding_handlers.add_post)],
+        states={
+            
+            NAME: [MessageHandler(Filters.text, name)],
+            PHOTO: [MessageHandler(Filters.photo, photo)],
+            
+            CAPTION: [MessageHandler(Filters.text & ~Filters.command, caption)],
+        },
+        
+        fallbacks=[]
+        
+    )
+    dp.add_handler(conv_handler)
+
+
+    dp.add_handler(MessageHandler(Filters.text,onboarding_handlers.echo))
+
 
     # admin commands
     dp.add_handler(CommandHandler("admin", admin_handlers.admin))
